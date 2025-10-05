@@ -47,7 +47,7 @@ GET / - информация об API
 1. Клонируйте репозиторий
 ```bash
 git clone https://github.com/darterss/Seat-Reservation-System.git
-cd seat-reservation-system
+cd Seat-Reservation-System
 ```
 
 2. Запустите
