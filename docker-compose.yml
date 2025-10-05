@@ -1,0 +1,81 @@
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: seat-reservation-db
+    environment:
+      POSTGRES_DB: seat_reservation
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d seat_reservation"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - seat-reservation-network
+
+
+  # Database Initialization
+  db-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seat-reservation-db-init
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: seat_reservation
+      DB_USER: user
+      DB_PASSWORD: password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "sh ./init-db.sh"]
+    networks:
+      - seat-reservation-network
+    restart: "no"
+
+  # Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seat-reservation-app
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: seat_reservation
+      DB_USER: user
+      DB_PASSWORD: password
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - seat-reservation-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  seat-reservation-network:
+    driver: bridge
