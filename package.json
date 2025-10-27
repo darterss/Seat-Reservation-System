@@ -1,0 +1,32 @@
+{
+  "name": "seat-reservation-system",
+  "version": "1.0.0",
+  "description": "Microservice for seat reservation system",
+  "main": "dist/src/app.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/app.js",
+    "dev": "tsx watch src/app.ts",
+    "lint": "eslint src/app.ts",
+    "lint:fix": "eslint src/app.ts --fix",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push:pg"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.6",
+    "fastify": "^4.24.3",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "@types/pg": "^8.10.7",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "drizzle-kit": "^0.31.5",
+    "eslint": "^8.54.0",
+    "tsx": "^4.1.4",
+    "typescript": "^5.2.2"
+  }
+}
